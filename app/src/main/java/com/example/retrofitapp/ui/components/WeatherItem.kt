@@ -1,4 +1,6 @@
 package com.example.retrofitapp.ui.components
 
-class WeatherItem {
+import com.example.retrofitapp.model.WeatherResponse
+
+class WeatherItem(weather: WeatherResponse) {
 }

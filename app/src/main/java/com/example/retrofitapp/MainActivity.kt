@@ -9,20 +9,21 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.example.retrofitapp.ui.theme.RetrofitAppTheme
-import com.example.retrofitapp.view.*
-import com.example.retrofitapp.viewmodel.APIViewModel
+import com.example.retrofitapp.view.WeatherScreen
+import com.example.retrofitapp.viewmodel.WeatherViewModel
 
 class MainActivity : ComponentActivity() {
+    private val weatherViewModel: WeatherViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val myViewModel by viewModels<APIViewModel>()
         setContent {
             RetrofitAppTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
-                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
                 ) {
-                    MyRecyclerView(myViewModel)
+                    WeatherScreen(viewModel = weatherViewModel)
                 }
             }
         }
