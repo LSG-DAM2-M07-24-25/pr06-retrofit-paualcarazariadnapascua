@@ -1,4 +1,4 @@
 package com.example.retrofitapp.nav
 
-class routes {
+class AppNavigation {
 }

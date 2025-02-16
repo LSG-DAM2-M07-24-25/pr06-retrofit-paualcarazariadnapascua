@@ -1,4 +1,4 @@
-package com.example.retrofitapp.routes
+package com.example.retrofitapp.nav
 
 sealed class Routes(val route: String) {
     object Home : Routes("home")

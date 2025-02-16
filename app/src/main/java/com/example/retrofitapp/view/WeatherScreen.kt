@@ -19,6 +19,7 @@ import coil.compose.rememberImagePainter
 import com.example.retrofitapp.model.WeatherResponse
 import com.example.retrofitapp.viewmodel.WeatherViewModel
 
+
 @Composable
 fun WeatherScreen(viewModel: WeatherViewModel = viewModel()) {
     val weatherData by viewModel.weatherData.observeAsState()

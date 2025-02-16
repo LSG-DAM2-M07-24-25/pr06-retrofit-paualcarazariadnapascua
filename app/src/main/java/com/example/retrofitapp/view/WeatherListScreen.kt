@@ -1,40 +1,36 @@
 package com.example.retrofitapp.view
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.retrofitapp.ui.components.WeatherItem
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.retrofitapp.viewmodel.WeatherViewModel
+import com.example.retrofitapp.ui.components.WeatherList
 
 @Composable
-fun WeatherListScreen(viewModel: WeatherViewModel) {
-    val isLoading by viewModel.loading.observeAsState(true)
-    val weatherData by viewModel.weatherData.observeAsState()
+fun WeatherListScreen(viewModel: WeatherViewModel = viewModel()) {
+    val weatherData by viewModel.weatherData.observeAsState(emptyList())
+    val isLoading by viewModel.isLoading.observeAsState(false)
+    val errorMessage by viewModel.errorMessage.observeAsState()
 
-    if (isLoading) {
-        Row(
-            modifier = Modifier.fillMaxSize(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            CircularProgressIndicator(
-                color = MaterialTheme.colorScheme.secondary
-            )
-        }
-    } else if (weatherData != null) {
-        LazyColumn {
-            items(listOf(weatherData!!)) { weather ->
-                WeatherItem(weather)
-            }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        if (isLoading) {
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+        } else if (errorMessage != null) {
+            Text(text = errorMessage!!, color = MaterialTheme.colorScheme.error)
+        } else {
+            WeatherList(weatherData) // Usamos el nuevo composable
         }
     }
 }

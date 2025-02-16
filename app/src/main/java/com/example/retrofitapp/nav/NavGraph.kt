@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.retrofitapp.nav.Routes
 import com.example.retrofitapp.view.CompactScreen
 import com.example.retrofitapp.view.MediumScreen
 import com.example.retrofitapp.view.ExtendedScreen

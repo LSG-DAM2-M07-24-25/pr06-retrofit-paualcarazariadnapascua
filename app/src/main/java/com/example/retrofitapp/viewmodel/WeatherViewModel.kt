@@ -1,35 +1,43 @@
 package com.example.retrofitapp.viewmodel
 
-import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.retrofitapp.api.Repository
-import com.example.retrofitapp.model.WeatherResponse
+import com.example.retrofitapp.model.WeatherEntity
+import com.example.retrofitapp.room.WeatherRepository
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
-class WeatherViewModel : ViewModel() {
+class WeatherViewModel(private val repository: WeatherRepository) : ViewModel() {
 
-    private val repository = Repository()
+    private val _weatherData = MutableLiveData<List<WeatherEntity>>()
+    val weatherData: LiveData<List<WeatherEntity>> = _weatherData
 
-    val weatherData = MutableLiveData<WeatherResponse?>()
-    val loading = MutableLiveData<Boolean>()
-    val errorMessage = MutableLiveData<String?>()
+    private val _isLoading = MutableLiveData<Boolean>()  // ✅ Definido correctamente
+    val isLoading: LiveData<Boolean> = _isLoading
+
+    private val _errorMessage = MutableLiveData<String?>()
+    val errorMessage: LiveData<String?> = _errorMessage
 
     fun fetchWeather(city: String, apiKey: String) {
-        loading.value = true
+        _isLoading.value = true  // ✅ Indicamos que la carga ha comenzado
+
         viewModelScope.launch {
             try {
-                val response = repository.getWeather(city, apiKey)
-                if (response.isSuccessful) {
-                    weatherData.value = response.body()
-                } else {
-                    errorMessage.value = "Error: ${response.code()} - ${response.message()}"
+                val newWeather = repository.fetchWeatherFromAPI(city, apiKey)
+                if (newWeather != null) {
+                    repository.insertWeather(newWeather)
                 }
+
+                repository.getAllWeatherData().collect { weatherList ->
+                    _weatherData.postValue(weatherList) // ✅ Usar `postValue()` en lugar de `value`
+                }
+
             } catch (e: Exception) {
-                errorMessage.value = "Error de conexión: ${e.message}"
+                _errorMessage.postValue("Error de conexión: ${e.message}")
             } finally {
-                loading.value = false
+                _isLoading.postValue(false)  // ✅ Usar `postValue()` en lugar de `value`
             }
         }
     }

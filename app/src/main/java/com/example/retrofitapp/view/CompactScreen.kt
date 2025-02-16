@@ -1,8 +1,11 @@
 package com.example.retrofitapp.view
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -12,8 +15,8 @@ import com.example.retrofitapp.ui.components.WeatherItem
 
 @Composable
 fun CompactScreen(viewModel: WeatherViewModel = viewModel()) {
-    val weatherData by viewModel.weatherData.observeAsState()
-    val isLoading by viewModel.loading.observeAsState(true)
+    val weatherData by viewModel.weatherData.observeAsState(emptyList()) // ✅ Asegurar `emptyList()`
+    val isLoading by viewModel.isLoading.observeAsState(false) // ✅ Asegurar `false` por defecto
     val errorMessage by viewModel.errorMessage.observeAsState()
 
     var city by remember { mutableStateOf("Barcelona") }
@@ -47,7 +50,11 @@ fun CompactScreen(viewModel: WeatherViewModel = viewModel()) {
         when {
             isLoading -> CircularProgressIndicator()
             errorMessage != null -> Text(text = errorMessage!!, color = MaterialTheme.colorScheme.error)
-            weatherData != null -> WeatherItem(weather = weatherData!!)
+            weatherData.isNotEmpty() -> LazyColumn { // ✅ Verificar que no esté vacío
+                items(weatherData) { weather ->
+                    WeatherItem(weather = weather)
+                }
+            }
         }
     }
 }
