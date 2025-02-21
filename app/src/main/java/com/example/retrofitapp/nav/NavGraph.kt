@@ -8,9 +8,10 @@ import com.example.retrofitapp.nav.Routes
 import com.example.retrofitapp.view.CompactScreen
 import com.example.retrofitapp.view.MediumScreen
 import com.example.retrofitapp.view.ExtendedScreen
+import com.example.retrofitapp.viewmodel.WeatherViewModel
 
 @Composable
-fun NavGraph(navController: NavHostController) {
+fun NavGraph(navController: NavHostController, weatherViewModel: WeatherViewModel) {
     NavHost(navController = navController, startDestination = Routes.CompactScreen.route) {
         composable(Routes.CompactScreen.route) { CompactScreen() }
         composable(Routes.MediumScreen.route) { MediumScreen() }
