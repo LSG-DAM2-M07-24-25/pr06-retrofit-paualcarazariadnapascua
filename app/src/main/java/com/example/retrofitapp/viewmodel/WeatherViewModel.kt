@@ -5,8 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.retrofitapp.model.WeatherEntity
-import com.example.retrofitapp.room.WeatherRepository
-import kotlinx.coroutines.flow.collect
+import com.example.retrofitapp.repository.WeatherRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class WeatherViewModel(private val repository: WeatherRepository) : ViewModel() {
@@ -14,7 +15,7 @@ class WeatherViewModel(private val repository: WeatherRepository) : ViewModel() 
     private val _weatherData = MutableLiveData<List<WeatherEntity>>()
     val weatherData: LiveData<List<WeatherEntity>> = _weatherData
 
-    private val _isLoading = MutableLiveData<Boolean>()  // ✅ Definido correctamente
+    private val _isLoading = MutableLiveData<Boolean>()  // ✅ Agregamos `isLoading`
     val isLoading: LiveData<Boolean> = _isLoading
 
     private val _errorMessage = MutableLiveData<String?>()
@@ -31,13 +32,13 @@ class WeatherViewModel(private val repository: WeatherRepository) : ViewModel() 
                 }
 
                 repository.getAllWeatherData().collect { weatherList ->
-                    _weatherData.postValue(weatherList) // ✅ Usar `postValue()` en lugar de `value`
+                    _weatherData.postValue(weatherList)
                 }
 
             } catch (e: Exception) {
                 _errorMessage.postValue("Error de conexión: ${e.message}")
             } finally {
-                _isLoading.postValue(false)  // ✅ Usar `postValue()` en lugar de `value`
+                _isLoading.postValue(false)  // ✅ Cuando termina, `isLoading` se pone en `false`
             }
         }
     }

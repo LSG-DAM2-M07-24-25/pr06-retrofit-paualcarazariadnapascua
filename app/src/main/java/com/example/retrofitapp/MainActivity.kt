@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import com.example.retrofitapp.nav.AppNavigation
 import com.example.retrofitapp.ui.theme.RetrofitAppTheme
 import com.example.retrofitapp.view.WeatherScreen
 import com.example.retrofitapp.viewmodel.WeatherViewModel
@@ -23,7 +24,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    WeatherScreen(viewModel = weatherViewModel)
+                    AppNavigation()
                 }
             }
         }

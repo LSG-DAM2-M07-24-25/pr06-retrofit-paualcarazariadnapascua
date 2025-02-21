@@ -1,6 +1,5 @@
-package com.example.retrofitapp.room
+package com.example.retrofitapp.api
 
-import com.example.retrofitapp.api.RetrofitInstance
 import com.example.retrofitapp.model.WeatherResponse
 import retrofit2.Response
 
