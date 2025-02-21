@@ -12,9 +12,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.retrofitapp.viewmodel.WeatherViewModel
 import com.example.retrofitapp.ui.components.WeatherItem
+import com.example.retrofitapp.viewmodel.WeatherViewModelFactory
 
 @Composable
-fun CompactScreen(viewModel: WeatherViewModel = viewModel()) {
+
+    fun CompactScreen(viewModel: WeatherViewModel){
     val weatherData by viewModel.weatherData.observeAsState(emptyList()) // ✅ Asegurar `emptyList()`
     val isLoading by viewModel.isLoading.observeAsState(false) // ✅ Asegurar `false` por defecto
     val errorMessage by viewModel.errorMessage.observeAsState()
