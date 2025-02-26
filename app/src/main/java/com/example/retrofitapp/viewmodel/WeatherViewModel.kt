@@ -1,10 +1,13 @@
 package com.example.retrofitapp.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.retrofitapp.api.RetrofitInstance
 import com.example.retrofitapp.model.WeatherEntity
+import com.example.retrofitapp.model.toEntity
 import com.example.retrofitapp.repository.WeatherRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,20 +29,26 @@ class WeatherViewModel(private val repository: WeatherRepository) : ViewModel() 
 
         viewModelScope.launch {
             try {
-                val newWeather = repository.fetchWeatherFromAPI(city, apiKey)
-                if (newWeather != null) {
-                    repository.insertWeather(newWeather)
+                val response = RetrofitInstance.api.getWeather(city, apiKey)
+                if (response.isSuccessful) {
+                    response.body()?.let { weatherResponse ->
+                        val weatherEntity = weatherResponse.toEntity()
+                        _weatherData.postValue(listOf(weatherEntity))
+                    } ?: Log.e("API_ERROR", "El cuerpo de la respuesta es null")
+                } else {
+                    Log.e("API_ERROR", "Error en la API: ${response.code()} - ${response.message()}")
                 }
-
-                repository.getAllWeatherData().collect { weatherList ->
-                    _weatherData.postValue(weatherList)
-                }
-
             } catch (e: Exception) {
-                _errorMessage.postValue("Error de conexión: ${e.message}")
+                Log.e("API_EXCEPTION", "Error en la API: ${e.message}")
             } finally {
-                _isLoading.postValue(false)  // ✅ Cuando termina, `isLoading` se pone en `false`
+                _isLoading.postValue(false)  // ✅ Indicamos que la carga ha terminado
             }
         }
     }
+
+
+
+
 }
+
+
