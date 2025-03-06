@@ -1,51 +1,69 @@
-# Android App with Retrofit LiveData and MVVM
-## Android Studio Version
-Android Studio Ladybug | 2024.2.1 Patch 2
+# 🌦️ Weather App - Aplicación de Clima con Jetpack Compose 🚀
 
-## Language
-Kotlin with JetPack Compose
+![Weather App](https://your_image_link_here.com) <!-- Cambia por tu imagen principal -->
 
-## Purpose
-This app is a demo of the use of **Retrofit** for accessing API REST using **MVVM** paradigm and **LiveData**.
+## 📖 Descripción
+Esta aplicación de clima desarrollada con **Jetpack Compose** y arquitectura **MVVM** permite obtener información del clima en tiempo real a través de la API de **OpenWeatherMap**. Además, integra **Room Database** para almacenar búsquedas recientes y cargarlas sin conexión. 
+
+🔥 **Diseñada para ser completamente responsive y adaptativa** usando `WindowSizeClass`, por lo que funciona perfectamente en móviles 📱, tablets 🏢 y pantallas grandes 🖥️.
+
+---
+
+## 🛠️ **Tecnologías Utilizadas**
+✅ **Kotlin** - Lenguaje principal  
+✅ **Jetpack Compose** - UI moderna y declarativa  
+✅ **MVVM** - Arquitectura modular y escalable  
+✅ **Retrofit** - Consumo de API REST  
+✅ **Room Database** - Persistencia de datos offline  
+✅ **Navigation Component** - Navegación entre pantallas  
+✅ **LiveData & State** - Gestión reactiva de datos  
+✅ **Material 3** - Diseño atractivo y moderno  
+✅ **WindowSizeClass** - Diseño responsive y adaptativo  
 
 ---
 
-# Gradle dependencies
-It is necessary to add the following dependencies in the file [`app/build.gradle.kts`](app/build.gradle.kts) (Module :app) level:
+## 📸 **Capturas de Pantalla**
 
-``` bash
-   //LIVEDATA
-    implementation("androidx.compose.runtime:runtime-livedata:1.7.5")
-    //RETROFIT
-    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation ("com.squareup.okhttp3:logging-interceptor:4.9.3")
-    //CORRUTINES
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
-    //GLIDE
-    implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
-    testImplementation("junit:junit:4.13.2")
-    //TESTS
-    testImplementation("io.mockk:mockk:1.12.2")
-    androidTestImplementation("androidx.test.ext:junit:1.2.1")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2024.10.01"))
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    debugImplementation("androidx.compose.ui:ui-tooling")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
-```
+| 📱 Vertical | 🌐 Horizontal | 💻 Tablet |
+|------------|-------------|-----------|
+| ![Home Vertical](https://your_home_vertical_image_link_here.com) | ![Home Horizontal](https://your_home_horizontal_image_link_here.com) | ![Tablet View](https://your_tablet_image_link_here.com) |
+| ![Search Vertical](https://your_search_vertical_image_link_here.com) | ![Search Horizontal](https://your_search_horizontal_image_link_here.com) |  |
+| ![Details Vertical](https://your_details_vertical_image_link_here.com) | ![Details Horizontal](https://your_details_horizontal_image_link_here.com) |  |
+| ![Settings Vertical](https://your_settings_vertical_image_link_here.com) | ![Settings Horizontal](https://your_settings_horizontal_image_link_here.com) |  |
 
-# AndroidManifest.xml
-It is necessary to add Internet access permissions in [AndroidManifest.xml](app/src/main/AndroidManifest.xml) file:
-
-``` bash
-  <uses-permission android:name="android.permission.INTERNET"/>
-```
-
-# Screenshot
-<img src="app/src/main/res/drawable/screenshot_20250119_223050.png" alt="App activity" width="300"/>
+🚀 **Imágenes de la aplicación en distintos dispositivos y orientaciones.**  
+💡 *Puedes reemplazar los enlaces con imágenes subidas a tu repositorio o a un servicio de imágenes como Imgur.*  
 
 ---
-# References
-- **APIREST credits**: [https://cursokotlin.com/mvvm-en-android-con-kotlin-livedata-y-view-binding-android-architecture-components/](https://github.com/viniciusschuelter/dattebayo-api)
-- **Project credits**: Dani Santiago
+
+## 📌 **Características Principales**
+✨ **Clima en tiempo real** con datos actualizados de OpenWeatherMap  
+🗺️ **Búsqueda de ciudades** con un campo de entrada interactivo  
+💾 **Persistencia con Room Database** para acceder a datos sin conexión  
+📱 **Diseño 100% responsive y adaptativo** con `WindowSizeClass`  
+🚀 **Rápido y eficiente** gracias a `LiveData`, `State` y `Coroutines`  
+🔍 **Historial de búsquedas** (opcional)  
+
+---
+WeatherApp/
+│── api/              # Retrofit para llamadas a la API
+│── model/            # Modelos de datos y entidades de Room
+│── repository/       # Repositorio para manejar datos de API y Room
+│── room/             # Base de datos con DAO y configuración de Room
+│── view/             # Pantallas de la aplicación en Jetpack Compose
+│── viewmodel/        # ViewModels para manejar lógica de UI
+│── navigation/       # Rutas de navegación con Navigation Component
+
+
+🌍 Cómo Funciona
+1️⃣ El usuario busca una ciudad en SearchScreen.
+2️⃣ Se obtiene el clima de la API con Retrofit.
+3️⃣ Los datos se guardan en Room para persistencia offline.
+4️⃣ Si el usuario abre la app sin internet, los datos se cargan desde Room.
+5️⃣ Interfaz adaptativa usando WindowSizeClass para distintos tamaños de pantalla.
+
+
+🛠️ Mejoras Futuras
+🚀 Modo oscuro 🌙 con Material 3
+📍 Ubicación automática para obtener el clima actual
+🌡️ Más detalles meteorológicos como viento y sensación térmica
