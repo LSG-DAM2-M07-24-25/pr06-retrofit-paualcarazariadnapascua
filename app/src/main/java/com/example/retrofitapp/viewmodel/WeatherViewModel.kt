@@ -46,9 +46,29 @@ class WeatherViewModel(private val repository: WeatherRepository) : ViewModel() 
         }
     }
 
-
-
+    suspend fun fetchWeatherDirect(city: String): WeatherEntity? {
+        return try {
+            val response = RetrofitInstance.api.getWeather(city, "59c3b2619ffb0c8f15d38d910cbb27f9")
+            if (response.isSuccessful) {
+                response.body()?.toEntity()
+            } else {
+                Log.e("API_ERROR", "Error en la API: ${response.code()} - ${response.message()}")
+                null
+            }
+        } catch (e: Exception) {
+            Log.e("API_EXCEPTION", "Error en la API: ${e.message}")
+            null
+        }
+    }
 
 }
+
+
+
+
+
+
+
+
 
 
