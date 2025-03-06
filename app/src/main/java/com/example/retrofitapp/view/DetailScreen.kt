@@ -1,5 +1,6 @@
 package com.example.retrofitapp.view
 
+import android.app.Activity
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -11,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -20,6 +22,7 @@ import com.example.retrofitapp.viewmodel.WeatherViewModel
 import kotlinx.coroutines.launch
 import com.example.retrofitapp.model.WeatherEntity
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.window.layout.WindowMetricsCalculator
 
 @Composable
 fun DetailScreen(city: String, navController: NavController, viewModel: WeatherViewModel = viewModel()) {
@@ -27,9 +30,10 @@ fun DetailScreen(city: String, navController: NavController, viewModel: WeatherV
     var weather by remember { mutableStateOf<WeatherEntity?>(null) }
     var isLoading by remember { mutableStateOf(true) }
 
-    // 🔹 Detecta la orientación del dispositivo
+    // 🔹 Detecta la orientación y tamaño de pantalla
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val windowSizeClass = getWindowSizeClassDetail()
 
     // 🔹 Cargar datos de la API solo si `city` no está vacío
     LaunchedEffect(city) {
@@ -43,7 +47,7 @@ fun DetailScreen(city: String, navController: NavController, viewModel: WeatherV
         }
     }
 
-    // 🔹 Diseño de la pantalla con degradado y adaptabilidad
+    // 🔹 Diseño adaptable usando `BoxWithConstraints`
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
@@ -53,34 +57,32 @@ fun DetailScreen(city: String, navController: NavController, viewModel: WeatherV
             .padding(16.dp),
         contentAlignment = Alignment.Center
     ) {
-        val maxWidth = this.maxWidth
-        val maxHeight = this.maxHeight
+        val maxWidthDp = maxWidth // Corrección para evitar error con .dp
 
-        if (isLandscape) {
-            // 📌 Modo Horizontal → Tarjeta y botón en una fila
+        if (isLandscape || windowSizeClass == WindowSizeClassDetail.EXPANDED) {
+            // 📌 Modo Horizontal o Pantallas Grandes → Distribución en `Row`
             Row(
                 modifier = Modifier.fillMaxSize(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceAround
+                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                // 🔹 Tarjeta de información
                 weather?.let { data ->
-                    WeatherInfoCard(data, maxWidth * 0.5f) // 50% de ancho
+                    WeatherInfoCardDetail(data, maxWidthDp * 0.5f) // ✅ 50% del ancho
                 } ?: CircularProgressIndicator(color = Color.White)
 
-                // 🔹 Botón de regreso siempre visible
+                // 🔹 Botón de regreso siempre visible en horizontal
                 Button(
                     onClick = { navController.popBackStack() },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.White),
                     modifier = Modifier
                         .padding(16.dp)
-                        .fillMaxWidth(0.3f) // 30% del ancho en horizontal
+                        .fillMaxWidth(0.3f) // ✅ Botón ocupa 30% del ancho
                 ) {
                     Text(text = "Volver", color = Color(0xFF0D47A1), fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 }
             }
         } else {
-            // 📌 Modo Vertical → Column con tarjeta y botón debajo
+            // 📌 Modo Vertical → Tarjeta arriba y botón debajo
             Column(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -97,18 +99,18 @@ fun DetailScreen(city: String, navController: NavController, viewModel: WeatherV
                     CircularProgressIndicator(color = Color.White)
                 } else {
                     weather?.let { data ->
-                        WeatherInfoCard(data, maxWidth * 0.85f) // 85% del ancho
+                        WeatherInfoCardDetail(data, maxWidthDp * 0.85f) // ✅ 85% del ancho
                     } ?: Text("No se encontraron datos", color = Color.White, fontSize = 18.sp)
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // 🔹 Botón de regreso en modo vertical (tamaño responsivo)
+                // 🔹 Botón de regreso en vertical (tamaño responsivo)
                 Button(
                     onClick = { navController.popBackStack() },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.White),
                     modifier = Modifier
-                        .fillMaxWidth(0.85f) // 85% del ancho en pantallas grandes
+                        .fillMaxWidth(0.85f) // ✅ Ocupa 85% del ancho en vertical
                         .padding(8.dp)
                 ) {
                     Text(text = "Volver", color = Color(0xFF0D47A1), fontSize = 16.sp, fontWeight = FontWeight.Bold)
@@ -120,11 +122,10 @@ fun DetailScreen(city: String, navController: NavController, viewModel: WeatherV
 
 // ✅ 📌 Composable para la tarjeta de información del clima
 @Composable
-fun WeatherInfoCard(data: WeatherEntity, width: Dp) {
+fun WeatherInfoCardDetail(data: WeatherEntity, width: Dp) {
     Card(
         modifier = Modifier
-            .width(width.toDp()) // ✅ Convertimos correctamente Float a Dp
-
+            .width(width) // ✅ Tamaño flexible corregido
             .padding(16.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White)
@@ -140,4 +141,24 @@ fun WeatherInfoCard(data: WeatherEntity, width: Dp) {
             Text(text = "Humedad: ${data.humidity}%", fontSize = 18.sp, color = Color.Gray)
         }
     }
+}
+
+// 🔹 Función para obtener el tamaño de pantalla con WindowSizeClass
+@Composable
+fun getWindowSizeClassDetail(): WindowSizeClassDetail {
+    val context = LocalContext.current
+    val activity = context as Activity
+    val metrics = WindowMetricsCalculator.getOrCreate().computeCurrentWindowMetrics(activity)
+    val widthDp = metrics.bounds.width() / activity.resources.displayMetrics.density
+
+    return when {
+        widthDp < 600 -> WindowSizeClassDetail.COMPACT // Móviles pequeños
+        widthDp < 840 -> WindowSizeClassDetail.MEDIUM  // Tablets pequeñas
+        else -> WindowSizeClassDetail.EXPANDED // Tablets grandes y escritorio
+    }
+}
+
+// 🔹 Enumeración de WindowSizeClass
+enum class WindowSizeClassDetail {
+    COMPACT, MEDIUM, EXPANDED
 }
