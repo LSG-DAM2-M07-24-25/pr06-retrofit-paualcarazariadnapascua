@@ -71,7 +71,7 @@ fun WeatherScreen(viewModel: WeatherViewModel = viewModel()) {
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = { viewModel.fetchWeather(city, apiKey) },
+                onClick = { viewModel.fetchWeather(city) },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1565C0))
             ) {
                 Text(text = "Buscar Clima", color = Color.White, fontWeight = FontWeight.Bold)
