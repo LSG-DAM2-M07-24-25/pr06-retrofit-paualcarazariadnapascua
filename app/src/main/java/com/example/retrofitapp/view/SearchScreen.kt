@@ -29,6 +29,7 @@ import com.example.retrofitapp.viewmodel.WeatherViewModel
 
 @Composable
 fun SearchScreen(viewModel: WeatherViewModel = viewModel()) {
+
     // 🔹 Detectar orientación del dispositivo
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
@@ -42,6 +43,9 @@ fun SearchScreen(viewModel: WeatherViewModel = viewModel()) {
     val errorMessage by viewModel.errorMessage.observeAsState()
 
     var city by remember { mutableStateOf("Barcelona") }
+    LaunchedEffect(Unit) {
+        viewModel.getSavedWeather("Madrid") // 🔹 Cambia "Barcelona" por la última búsqueda guardada
+    }
 
     Box(
         modifier = Modifier

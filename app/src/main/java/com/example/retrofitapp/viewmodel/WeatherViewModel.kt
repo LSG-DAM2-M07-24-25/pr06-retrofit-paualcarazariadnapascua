@@ -35,7 +35,9 @@ class WeatherViewModel(private val repository: WeatherRepository) : ViewModel() 
                 if (response.isSuccessful) {
                     response.body()?.let { weatherResponse ->
                         val weatherEntity = weatherResponse.toEntity()
-                        _weatherData.postValue(listOf(weatherEntity)) // ✅ Convertit en llista
+                        _weatherData.postValue(listOf(weatherEntity)) // ✅ Guarda en LiveData
+
+                        repository.insertWeather(weatherEntity) // 🔹 Guarda en Room
                     }
                 } else {
                     Log.e("API_ERROR", "Error API: ${response.code()} - ${response.message()}")
@@ -48,21 +50,42 @@ class WeatherViewModel(private val repository: WeatherRepository) : ViewModel() 
         }
     }
 
-    // ✅ FUNCIO CORRECTA PER FER UNA CRIDA DIRECTA
+
     suspend fun fetchWeatherDirect(city: String): WeatherEntity? {
-        return withContext(Dispatchers.IO) {  // ✅ S'executa en el Dispatcher adequat
+        return withContext(Dispatchers.IO) {
             try {
+                // 🔹 Buscar primero en Room
+                val cachedWeather = repository.getWeatherByCity(city)
+                if (cachedWeather != null) {
+                    return@withContext cachedWeather // ✅ Si está en Room, lo devuelve
+                }
+
+                // 🔹 Si no está en Room, llamar a la API
                 val response = RetrofitInstance.api.getWeather(city, apiKey)
                 if (response.isSuccessful) {
-                    response.body()?.toEntity()
+                    response.body()?.toEntity()?.also {
+                        repository.insertWeather(it) // ✅ Guarda en Room
+                    }
                 } else {
-                    Log.e("API_ERROR", "Error en la API: ${response.code()} - ${response.message()}")
+                    Log.e("API_ERROR", "Error API: ${response.code()} - ${response.message()}")
                     null
                 }
             } catch (e: Exception) {
-                Log.e("API_EXCEPTION", "Error en la API: ${e.message}")
+                Log.e("API_EXCEPTION", "Error API: ${e.message}")
                 null
             }
         }
     }
+
+
+    fun getSavedWeather(city: String) {
+        viewModelScope.launch {
+            val savedWeather = repository.getWeatherByCity(city) // 🔹 Carga de Room
+            savedWeather?.let {
+                _weatherData.postValue(listOf(it)) // ✅ Muestra el clima guardado
+            }
+        }
+    }
+
+
 }

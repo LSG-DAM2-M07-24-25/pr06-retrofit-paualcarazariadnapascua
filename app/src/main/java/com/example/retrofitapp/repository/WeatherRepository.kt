@@ -57,6 +57,13 @@ class WeatherRepository(
         }
     }
 
+    suspend fun getWeatherByCity(city: String): WeatherEntity? {
+        return withContext(Dispatchers.IO) {
+            weatherDao.getWeatherByCity(city) // ✅ Recupera de Room
+        }
+    }
+
+
 
 }
 
