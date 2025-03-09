@@ -25,8 +25,29 @@ class WeatherViewModel(private val repository: WeatherRepository) : ViewModel() 
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> = _errorMessage
 
+    private val _searchedText = MutableLiveData("")
+    val searchedText: LiveData<String> = _searchedText
+
+    private val _searchHistory = MutableLiveData<List<String>>(emptyList())
+    val searchHistory: LiveData<List<String>> = _searchHistory
+
     private val apiKey = "59c3b2619ffb0c8f15d38d910cbb27f9"  // ✅ API Key aquí
 
+    fun onSearchTextChange(text: String) {
+        _searchedText.value = text
+    }
+
+    fun addToHistory(text: String) {
+        if (text.isNotBlank()) {
+            val currentHistory = _searchHistory.value.orEmpty()
+            _searchHistory.value = listOf(text) + currentHistory
+            _searchedText.value = ""
+        }
+    }
+
+    fun clearHistory() {
+        _searchHistory.value = emptyList()
+    }
     fun fetchWeather(city: String) {
         _isLoading.value = true
         viewModelScope.launch {
