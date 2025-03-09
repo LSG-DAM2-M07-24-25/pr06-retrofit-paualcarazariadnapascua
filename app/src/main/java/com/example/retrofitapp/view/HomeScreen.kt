@@ -1,6 +1,6 @@
 package com.example.retrofitapp.view
 
-import android.app.Activity
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,12 +12,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationCity
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
@@ -28,39 +27,32 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.window.layout.WindowMetricsCalculator
 import com.example.retrofitapp.model.WeatherEntity
+import com.example.retrofitapp.model.getWindowSizeClass
+import com.example.retrofitapp.model.WindowSizeClassSearchh
 import com.example.retrofitapp.viewmodel.WeatherViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavController, viewModel: WeatherViewModel = viewModel()) {
-    val cities = listOf(
-        "London", "New York", "Tokyo", "Madrid", "Paris",
-        "Berlin", "Rome", "Los Angeles", "Sydney", "Moscow",
-        "Toronto", "São Paulo", "Mexico City", "Seoul", "Dubai",
-        "Beijing", "Hong Kong", "Bangkok", "Istanbul", "Singapore"
-    )
+    val context = LocalContext.current
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val windowSizeClass = getWindowSizeClass(context)
 
-    val weatherList = remember { mutableStateListOf<WeatherEntity>() }
-    val isLoading = remember { mutableStateOf(true) }
-    val coroutineScope = rememberCoroutineScope()
+    val weatherList by viewModel.popularCitiesWeather.observeAsState(emptyList())  // 🔹 Observa los datos del ViewModel
+    val isLoading by viewModel.isLoading.observeAsState(false)
+
     var searchQuery by remember { mutableStateOf("") }
-    val searchHistory = remember { mutableStateListOf<String>() } // ✅ Historial de búsqueda
+    val searchHistory = remember { mutableStateListOf<String>() }
 
-    val filteredList = weatherList.filter { it.city.contains(searchQuery, ignoreCase = true) }
+    // 🔹 Filtrar la lista de ciudades según la búsqueda
+    val filteredWeatherList = weatherList.filter { it.city.contains(searchQuery, ignoreCase = true) }
 
+    // 🔹 Carga inicial de ciudades populares
     LaunchedEffect(Unit) {
-        cities.forEach { city ->
-            coroutineScope.launch {
-                val weather = viewModel.fetchWeatherDirect(city)
-                if (weather != null) {
-                    weatherList.add(weather)
-                }
-            }
-        }
-        isLoading.value = false
+        viewModel.fetchPopularCitiesWeather()
     }
 
     Box(
@@ -69,87 +61,154 @@ fun HomeScreen(navController: NavController, viewModel: WeatherViewModel = viewM
             .background(Brush.verticalGradient(colors = listOf(Color(0xFF0D47A1), Color(0xFF42A5F5)))),
         contentAlignment = Alignment.Center
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize().padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        if (isLandscape || windowSizeClass == WindowSizeClassSearchh.EXPANDED) {
+            // 🖥️ **Diseño para pantallas grandes**
             Row(
-                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxSize().padding(16.dp),
                 horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = Icons.Default.LocationCity,
-                    contentDescription = "Ciudades",
-                    tint = Color.White,
-                    modifier = Modifier.size(28.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "Ciudades Populares", fontSize = 26.sp, color = Color.White)
-            }
-
-            // 🔹 SearchBarView con Historial de Búsqueda
-            SearchBarView(
-                searchQuery = searchQuery,
-                onQueryChange = { searchQuery = it },
-                onSearch = {
-                    if (searchQuery.isNotBlank() && !searchHistory.contains(searchQuery)) {
-                        searchHistory.add(0, searchQuery) // ✅ Guarda en el historial
-                    }
-                    viewModel.fetchWeather(searchQuery)
-                }
-            )
-
-            // 🔹 Mostrar Historial de Búsqueda
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-                contentPadding = PaddingValues(8.dp)
-            ) {
-                items(searchHistory) { pastSearch ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp)
-                            .clickable { searchQuery = pastSearch }, // ✅ Al hacer clic, rellena el SearchBar
-                        shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD))
-                    ) {
-                        Text(
-                            text = pastSearch,
-                            modifier = Modifier.padding(16.dp),
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                }
-            }
-
-            if (isLoading.value) {
-                CircularProgressIndicator(color = Color.White)
-            } else {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    contentPadding = PaddingValues(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth(0.4f)
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    items(filteredList) { weather ->
-                        HomeWeatherCard(weather, navController)
-                    }
+                    HomeTitle()
+                    SearchBarView(
+                        searchQuery = searchQuery,
+                        onQueryChange = { searchQuery = it },
+                        onSearch = {
+                            if (searchQuery.isNotBlank() && !searchHistory.contains(searchQuery)) {
+                                searchHistory.add(0, searchQuery) // ✅ Guarda en historial
+                            }
+                            viewModel.fetchWeather(searchQuery)
+                        }
+                    )
+                    SearchHistoryList(searchHistory) { searchQuery = it }
                 }
+                Spacer(modifier = Modifier.width(20.dp))
+                WeatherGrid(isLoading, filteredWeatherList, navController, windowSizeClass) // ✅ Usa la lista filtrada
+            }
+        } else {
+            // 📱 **Diseño para móviles**
+            Column(
+                modifier = Modifier.fillMaxSize().padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                HomeTitle()
+                SearchBarView(
+                    searchQuery = searchQuery,
+                    onQueryChange = { searchQuery = it },
+                    onSearch = {
+                        if (searchQuery.isNotBlank() && !searchHistory.contains(searchQuery)) {
+                            searchHistory.add(0, searchQuery) // ✅ Guarda en historial
+                        }
+                        viewModel.fetchWeather(searchQuery)
+                    }
+                )
+                SearchHistoryList(searchHistory) { searchQuery = it }
+                WeatherGrid(isLoading, filteredWeatherList, navController, windowSizeClass) // ✅ Usa la lista filtrada
             }
         }
     }
 }
 
 
+// 🔹 **Título principal**
+@Composable
+fun HomeTitle() {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+    ) {
+        Icon(
+            imageVector = Icons.Default.LocationCity,
+            contentDescription = "Ciudades",
+            tint = Color.White,
+            modifier = Modifier.size(28.dp)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = "Ciudades Populares",
+            fontSize = 26.sp,
+            color = Color.White,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
 
+// 🔹 **Lista de historial de búsqueda**
+@Composable
+fun SearchHistoryList(searchHistory: List<String>, onSearchSelected: (String) -> Unit) {
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+        contentPadding = PaddingValues(8.dp)
+    ) {
+        items(searchHistory) { pastSearch ->
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp)
+                    .clickable { onSearchSelected(pastSearch) },
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD))
+            ) {
+                Text(
+                    text = pastSearch,
+                    modifier = Modifier.padding(16.dp),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
+    }
+}
+// 🔹 **Grid con la lista de climas**
+@Composable
+fun WeatherGrid(
+    isLoading: Boolean,
+    weatherList: List<WeatherEntity>,
+    navController: NavController,
+    windowSizeClass: WindowSizeClassSearchh
+) {
+    if (isLoading) {
+        CircularProgressIndicator(color = Color.White)
+    } else if (weatherList.isEmpty()) {
+        // ✅ Mostrar mensaje si no hay resultados tras filtrar
+        Text(
+            text = "No se encontraron resultados",
+            fontSize = 18.sp,
+            color = Color.White,
+            modifier = Modifier.padding(16.dp)
+        )
+    } else {
+        val columns = when (windowSizeClass) {
+            WindowSizeClassSearchh.EXPANDED -> 3
+            WindowSizeClassSearchh.MEDIUM -> 2
+            else -> 1
+        }
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(columns),
+            contentPadding = PaddingValues(8.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(weatherList) { weather ->  // ✅ Se usa `filteredWeatherList`
+                HomeWeatherCard(weather, navController)
+            }
+        }
+    }
+}
+
+
+// 🔹 **Tarjeta de Clima**
 @Composable
 fun HomeWeatherCard(weather: WeatherEntity, navController: NavController) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .clip(RoundedCornerShape(16.dp))
             .clickable { navController.navigate("details/${weather.city}") },
         colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {

@@ -1,12 +1,9 @@
 package com.example.retrofitapp.view
 
-import android.app.Activity
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -14,7 +11,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
@@ -23,28 +19,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.window.layout.WindowMetricsCalculator
+import com.example.retrofitapp.model.WindowSizeClassSearchh
+import com.example.retrofitapp.model.getWindowSizeClass
 import com.example.retrofitapp.model.WeatherEntity
 import com.example.retrofitapp.viewmodel.WeatherViewModel
 
 @Composable
 fun SearchScreen(viewModel: WeatherViewModel = viewModel()) {
-
-    // 🔹 Detectar orientación del dispositivo
+    val context = LocalContext.current
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val windowSizeClass = getWindowSizeClass(context)
 
-    // 🔹 Detectar tamaño de pantalla con WindowSizeClass
-    val windowSizeClass = getWindowSizeClassSearch()
-
-    // 🔹 Obtener datos del ViewModel
     val weatherData: List<WeatherEntity> by viewModel.weatherData.observeAsState(emptyList())
     val isLoading by viewModel.isLoading.observeAsState(false)
     val errorMessage by viewModel.errorMessage.observeAsState()
 
     var city by remember { mutableStateOf("Barcelona") }
+
     LaunchedEffect(Unit) {
-        viewModel.getSavedWeather("Madrid") // 🔹 Cambia "Barcelona" por la última búsqueda guardada
+        viewModel.getSavedWeather("Madrid") // 🔹 Carga el clima de una ciudad guardada
     }
 
     Box(
@@ -57,8 +51,8 @@ fun SearchScreen(viewModel: WeatherViewModel = viewModel()) {
             ),
         contentAlignment = Alignment.Center
     ) {
-        if (isLandscape || windowSizeClass == WindowSizeClassSearch.EXPANDED) {
-            // 🖥️ Diseño horizontal o pantallas grandes
+        if (isLandscape || windowSizeClass == WindowSizeClassSearchh.EXPANDED) {
+            // 🖥️ **Diseño horizontal o pantallas grandes**
             Row(
                 modifier = Modifier.fillMaxSize().padding(16.dp),
                 horizontalArrangement = Arrangement.Center,
@@ -76,7 +70,7 @@ fun SearchScreen(viewModel: WeatherViewModel = viewModel()) {
                 WeatherResult(isLoading, errorMessage, weatherData)
             }
         } else {
-            // 📱 Diseño vertical (móviles) con Scroll
+            // 📱 **Diseño vertical (móviles) con Scroll**
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -106,7 +100,7 @@ fun WeatherResult(isLoading: Boolean, errorMessage: String?, weatherData: List<W
     }
 }
 
-//VALIDACIÓ DE CAMPS
+// 🔹 **Validación y búsqueda**
 @Composable
 fun SearchContent(city: String, onCityChange: (String) -> Unit, onSearch: () -> Unit) {
     var isError by remember { mutableStateOf(false) }
@@ -116,10 +110,10 @@ fun SearchContent(city: String, onCityChange: (String) -> Unit, onSearch: () -> 
             value = city,
             onValueChange = {
                 onCityChange(it)
-                isError = it.isBlank()  // 🔹 Activa el error si el campo está vacío
+                isError = it.isBlank()
             },
             label = { Text("Introduce una ciudad", color = Color.Black) },
-            isError = isError, // 🔹 Aplica el estado de error al TextField
+            isError = isError,
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = Color.White,
                 unfocusedContainerColor = Color(0xFFE3F2FD),
@@ -129,9 +123,8 @@ fun SearchContent(city: String, onCityChange: (String) -> Unit, onSearch: () -> 
             ),
             modifier = Modifier
                 .fillMaxWidth(0.85f)
-                .clip(RoundedCornerShape(12.dp))
+                .clip(MaterialTheme.shapes.medium)
         )
-        // 🔹 Mostrar mensaje de error si es necesario
         if (isError) {
             Text("El campo no puede estar vacío", color = Color.Red, fontSize = 14.sp)
         }
@@ -143,10 +136,10 @@ fun SearchContent(city: String, onCityChange: (String) -> Unit, onSearch: () -> 
                 if (city.isNotBlank()) {
                     onSearch()
                 } else {
-                    isError = true // 🔹 Activa el error si el usuario intenta buscar sin escribir nada
+                    isError = true
                 }
             },
-            enabled = city.isNotBlank(), // 🔹 Deshabilita el botón si el campo está vacío
+            enabled = city.isNotBlank(),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1565C0))
         ) {
             Text(text = "Buscar Clima", color = Color.White, fontWeight = FontWeight.Bold)
@@ -154,14 +147,12 @@ fun SearchContent(city: String, onCityChange: (String) -> Unit, onSearch: () -> 
     }
 }
 
-
 @Composable
 fun SearchWeatherCard(weather: WeatherEntity) {
     Card(
         modifier = Modifier
             .fillMaxWidth(0.85f)
-            .padding(16.dp)
-            .shadow(10.dp, RoundedCornerShape(16.dp)),
+            .padding(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFF))
     ) {
         Column(
@@ -176,58 +167,19 @@ fun SearchWeatherCard(weather: WeatherEntity) {
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF1565C0)
             )
-
             Spacer(modifier = Modifier.height(10.dp))
-
             Text(
                 text = "${weather.temperature}°C",
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF0D47A1)
             )
-
             Spacer(modifier = Modifier.height(6.dp))
-
             Text(
                 text = "Humedad: ${weather.humidity}%",
                 fontSize = 18.sp,
                 color = Color.Gray
             )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Box(
-                modifier = Modifier
-                    .size(60.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFFE3F2FD)),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "🌦️",
-                    fontSize = 34.sp
-                )
-            }
         }
     }
-}
-
-// 🔹 Función para obtener el tamaño de pantalla con WindowSizeClass
-@Composable
-fun getWindowSizeClassSearch(): WindowSizeClassSearch {
-    val context = LocalContext.current
-    val activity = context as Activity
-    val metrics = WindowMetricsCalculator.getOrCreate().computeCurrentWindowMetrics(activity)
-    val widthDp = metrics.bounds.width() / activity.resources.displayMetrics.density
-
-    return when {
-        widthDp < 600 -> WindowSizeClassSearch.COMPACT // Móviles pequeños
-        widthDp < 840 -> WindowSizeClassSearch.MEDIUM  // Tablets pequeñas
-        else -> WindowSizeClassSearch.EXPANDED // Tablets grandes y escritorio
-    }
-}
-
-// 🔹 Enumeración de WindowSizeClass
-enum class WindowSizeClassSearch {
-    COMPACT, MEDIUM, EXPANDED
 }

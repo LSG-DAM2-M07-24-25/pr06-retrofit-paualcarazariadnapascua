@@ -1,7 +1,5 @@
 package com.example.retrofitapp.view
 
-import android.app.Activity
-import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -20,16 +18,15 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.window.layout.WindowMetricsCalculator
+import com.example.retrofitapp.model.WindowSizeClassSearchh
+import com.example.retrofitapp.model.getWindowSizeClass
 
 @Composable
 fun SettingsScreen() {
-    // 🔹 Detectar orientación del dispositivo
+    val context = LocalContext.current
     val configuration = LocalConfiguration.current
-    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-
-    // 🔹 Detectar tamaño de pantalla con WindowSizeClass
-    val windowSizeClass = getWindowSizeClassSettings()
+    val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+    val windowSizeClass = getWindowSizeClass(context)
 
     // 🔹 Layout principal
     Box(
@@ -42,8 +39,8 @@ fun SettingsScreen() {
             ),
         contentAlignment = Alignment.TopCenter
     ) {
-        if (isLandscape || windowSizeClass == WindowSizeClasss.EXPANDED) {
-            // 🖥️ Diseño horizontal o pantallas grandes
+        if (isLandscape || windowSizeClass == WindowSizeClassSearchh.EXPANDED) {
+            // 🖥️ **Diseño horizontal o pantallas grandes**
             Row(
                 modifier = Modifier.fillMaxSize().padding(16.dp),
                 horizontalArrangement = Arrangement.Center,
@@ -52,12 +49,12 @@ fun SettingsScreen() {
                 SettingsContent(modifier = Modifier.fillMaxWidth(0.6f))
             }
         } else {
-            // 📱 Diseño vertical (móviles y pantallas pequeñas)
+            // 📱 **Diseño vertical (móviles y pantallas pequeñas)**
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(16.dp)
-                    .verticalScroll(rememberScrollState()), // Permite desplazamiento en pantallas pequeñas
+                    .verticalScroll(rememberScrollState()), // 🔹 Permite desplazamiento en pantallas pequeñas
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 SettingsContent(modifier = Modifier.fillMaxWidth())
@@ -77,23 +74,23 @@ fun SettingsContent(modifier: Modifier) {
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // 🔹 Acerca de la aplicación (Diseño mejorado)
+        // 🔹 **Acerca de la aplicación** (Diseño mejorado)
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .shadow(10.dp, shape = RoundedCornerShape(16.dp)), // Sombra y bordes redondeados
+                .shadow(10.dp, shape = RoundedCornerShape(16.dp)), // 🔹 Sombra y bordes redondeados
             colors = CardDefaults.cardColors(
-                containerColor = Color.White // Fondo blanco
+                containerColor = Color.White // 🔹 Fondo blanco
             ),
-            shape = RoundedCornerShape(16.dp), // Bordes redondeados
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp) // Elevación para sombra
+            shape = RoundedCornerShape(16.dp), // 🔹 Bordes redondeados
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp) // 🔹 Elevación para sombra
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(
                         Brush.verticalGradient(
-                            colors = listOf(Color(0xFFE3F2FD), Color.White) // Degradado suave
+                            colors = listOf(Color(0xFFE3F2FD), Color.White) // 🔹 Degradado suave
                         )
                     )
                     .padding(16.dp)
@@ -112,24 +109,4 @@ fun SettingsContent(modifier: Modifier) {
             }
         }
     }
-}
-
-// 🔹 Función para obtener el tamaño de pantalla con WindowSizeClass
-@Composable
-fun getWindowSizeClassSettings(): WindowSizeClasss {
-    val context = LocalContext.current
-    val activity = context as Activity
-    val metrics = WindowMetricsCalculator.getOrCreate().computeCurrentWindowMetrics(activity)
-    val widthDp = metrics.bounds.width() / activity.resources.displayMetrics.density
-
-    return when {
-        widthDp < 600 -> WindowSizeClasss.COMPACT // Móviles pequeños
-        widthDp < 840 -> WindowSizeClasss.MEDIUM  // Tablets pequeñas
-        else -> WindowSizeClasss.EXPANDED // Tablets grandes y escritorio
-    }
-}
-
-// 🔹 Enumeración de WindowSizeClass
-enum class WindowSizeClasss {
-    COMPACT, MEDIUM, EXPANDED
 }
