@@ -33,7 +33,7 @@ import com.example.retrofitapp.model.WindowSizeClassSearchh
 import com.example.retrofitapp.viewmodel.WeatherViewModel
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun HomeScreen(navController: NavController, viewModel: WeatherViewModel = viewModel()) {
     val context = LocalContext.current
