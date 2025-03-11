@@ -1,4 +1,4 @@
-package com.example.retrofitapp.view
+package com.example.retrofitapp.view.search
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height

@@ -1,4 +1,4 @@
-package com.example.retrofitapp.view
+package com.example.retrofitapp.view.search
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
