@@ -10,10 +10,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.retrofitapp.ui.components.BottomNavigationBar
-import com.example.retrofitapp.view.*
 import com.example.retrofitapp.view.detail.DetailScreen
 import com.example.retrofitapp.view.home.HomeScreen
 import com.example.retrofitapp.view.search.SearchScreen
+import com.example.retrofitapp.view.settings.SettingsScreen
 import com.example.retrofitapp.viewmodel.WeatherViewModel
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
