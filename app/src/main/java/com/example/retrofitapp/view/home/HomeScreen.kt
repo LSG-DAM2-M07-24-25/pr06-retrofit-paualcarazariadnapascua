@@ -1,4 +1,4 @@
-package com.example.retrofitapp.view
+package com.example.retrofitapp.view.home
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
@@ -30,8 +30,8 @@ import androidx.navigation.NavController
 import com.example.retrofitapp.model.WeatherEntity
 import com.example.retrofitapp.model.getWindowSizeClass
 import com.example.retrofitapp.model.WindowSizeClassSearchh
+import com.example.retrofitapp.view.SearchBarView
 import com.example.retrofitapp.viewmodel.WeatherViewModel
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
