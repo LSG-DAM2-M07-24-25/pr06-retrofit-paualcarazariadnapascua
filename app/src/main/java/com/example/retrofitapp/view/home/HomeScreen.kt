@@ -30,7 +30,7 @@ import androidx.navigation.NavController
 import com.example.retrofitapp.model.WeatherEntity
 import com.example.retrofitapp.model.getWindowSizeClass
 import com.example.retrofitapp.model.WindowSizeClassSearchh
-import com.example.retrofitapp.view.SearchBarView
+import com.example.retrofitapp.view.search.SearchBarView
 import com.example.retrofitapp.viewmodel.WeatherViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
