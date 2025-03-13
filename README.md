@@ -26,7 +26,7 @@ Esta aplicación de clima desarrollada con **Jetpack Compose** y arquitectura **
 
 | 📱 Vertical | 🌐 Horizontal | 💻 Tablet |
 |------------|-------------|-----------|
-| ![Home Vertical](home8.png) | ![Home Horizontal](home8.png) | ![Tablet View](tablet.png) |
+| ![Home Vertical](home8.png) | ![Home Horizontal](home4.png) | ![Tablet View](tablet.png) |
 | ![Search Vertical](123) | ![Search Horizontal](searchgirada.png) | ![Tablet View](https://your_tablet_image_link_here.com) |
 | ![Details Vertical](detalle.png) | ![Details Horizontal](detallegirada.png) |  |
 | ![Settings Vertical](ajustes.png) | ![Settings Horizontal](ajustesgirada.png) |  |
