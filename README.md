@@ -26,10 +26,10 @@ Esta aplicación de clima desarrollada con **Jetpack Compose** y arquitectura **
 
 | 📱 Vertical | 🌐 Horizontal | 💻 Tablet |
 |------------|-------------|-----------|
-| ![Home Vertical](https://your_home_vertical_image_link_here.com) | ![Home Horizontal](https://your_home_horizontal_image_link_here.com) | ![Tablet View](https://your_tablet_image_link_here.com) |
-| ![Search Vertical](https://your_search_vertical_image_link_here.com) | ![Search Horizontal](https://your_search_horizontal_image_link_here.com) |  |
-| ![Details Vertical](https://your_details_vertical_image_link_here.com) | ![Details Horizontal](https://your_details_horizontal_image_link_here.com) |  |
-| ![Settings Vertical](https://your_settings_vertical_image_link_here.com) | ![Settings Horizontal](https://your_settings_horizontal_image_link_here.com) |  |
+| ![Home Vertical](home8.png) | ![Home Horizontal](home8.png) | ![Tablet View](tablet.png) |
+| ![Search Vertical](123) | ![Search Horizontal](searchgirada.png) | ![Tablet View](https://your_tablet_image_link_here.com) |
+| ![Details Vertical](detalle.png) | ![Details Horizontal](detallegirada.png) |  |
+| ![Settings Vertical](ajustes.png) | ![Settings Horizontal](ajustesgirada.png) |  |
 
 🚀 **Imágenes de la aplicación en distintos dispositivos y orientaciones.**  
 💡 *Puedes reemplazar los enlaces con imágenes subidas a tu repositorio o a un servicio de imágenes como Imgur.*  
